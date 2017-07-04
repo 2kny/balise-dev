@@ -6,7 +6,8 @@
 
 <head>
 
-   <link rel="stylesheet" href="/media/css/style.css" />
+   <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+   <link rel="stylesheet" href="{% static 'css/dist/css/bootstrap.min.css' %}" />
 
    <title>{% block title %}Balise{% endblock %}</title>
 
@@ -15,36 +16,39 @@
 <body>
 
   <header>
-    <img src="{% static 'img/Balise_1.jpg' %}" alt="Logo Balise" />
+    <img src="{% static 'img/Balise_2.png' %}" alt="Logo Balise" class='centre' />
   </header>
-  <nav>
-
+  <nav class='navbar navbar-default'>
+	<div class='container-fluid kesdorado'>
+<div class='navbar-header'>
+<a href="/" class='navbar-brand'><p class='kesdorado'>Accueil</p></a>
      {% block nav %}
-
-     <ul>
-          <li><a href="/">Accueil</a></li>
+     <ul class='nav navbar-nav'>
 
           {% if user.is_authenticated %}
-            <li><a href="/compta">Compta</a></li>
-            <li><a href="/accounts/logout">Déconnexion</a></li>
+            <li><a href="/binets" class='navbar-brand'><p class='kesdorado'>Liste des binets</p></a></li>
+            <li><a href="/compta" class='navbar-brand'><p class='kesdorado'>Compta</p></a></li>
+            <li><a href="/accounts" class='navbar-brand'><p class='kesdorado'>Mon compte</p></a></li>
+            <li><a href="/accounts/logout" class='navbar-brand'><p class='kesdorado'>Déconnexion</p></a></li>
           {% else %}
-            <li><a href="/accounts/login">Connexion</a></li>
+            <li><a href="/accounts/login" class='navbar-brand'><p class='kesdorado'>Connexion</p></a></li>
+            <li><a href="/accounts/create" class='navbar-brand'><p class='kesdorado'>Créer un compte</p></a></li>
           {% endif %}
 
 
      </ul>
-
+</div>
      {% endblock %}
-
+	</div>
  </nav>
 
- <section id="content">
+ <section id="content" class='marge-bas'>
 
      {% block content %}{% endblock %}
 
  </section>
 
-<footer>&copy; Balise 2017</footer>
+<footer>&copy; Balise 2017 - Développement François Farge et Jean-Baptiste de Cagny</footer>
 
 </body>
 
