@@ -1,5 +1,5 @@
 from django.db import models
-from binets.models import Binet
+from binets.models import Binet, Mandat
 
 class Section(models.Model):
 	"""table des sections"""
@@ -20,21 +20,11 @@ class EleveVos(models.Model):
 		
 	
 
-class VOS(Binet):
-	"""ici un VOS. L'attribut promotion correspond à la promotion organisatrice"""
-	section = models.ForeignKey('vos.Section')
-	#def __init__(self):
-	#	self.nom = "VOS {0} {1}".format(self.section, int(self.promotion.nom)+2)
-	#	type_binet = "VOS"
-	#	Binet.__init__(self)
-
-	def __str__(self):
-		return "VOS {0}".format(self.section)
 
 class Participation(models.Model):
 	"""table de participation a un evenement"""
 	eleve = models.ForeignKey('vos.eleveVos')
-	evenement = models.ForeignKey('vos.VOS')
+	evenement = models.ForeignKey('binets.Mandat')
 	promotion = models.ForeignKey('accounts.Promotion')
 	participation = models.BooleanField()
 
@@ -46,7 +36,7 @@ class Participation(models.Model):
 
 class MontantCheque(models.Model):
 	"""table des montants des différents chèques"""
-	evenement = models.ForeignKey('vos.VOS')
+	evenement = models.ForeignKey('binets.Mandat')
 	promotion = models.ForeignKey('accounts.Promotion')
 	ordre = models.IntegerField()
 	montant = models.DecimalField(max_digits=5, decimal_places=2)	
@@ -56,7 +46,7 @@ class MontantCheque(models.Model):
 
 class Encaissement(models.Model):
 	"""table des encaissements par élève"""
-	evenement = models.ForeignKey('vos.VOS')
+	evenement = models.ForeignKey('binets.Mandat')
 	montant = models.ForeignKey('vos.MontantCheque')
 	eleve = models.ForeignKey('accounts.Eleve')
 	promotion = models.ForeignKey('accounts.Promotion')
@@ -67,7 +57,7 @@ class Encaissement(models.Model):
 
 class Remboursement(models.Model):
 	"""table des remboursements par élève"""
-	evenement = models.ForeignKey('vos.VOS')
+	evenement = models.ForeignKey('binets.Mandat')
 	montant = models.DecimalField(max_digits=5, decimal_places=2)
 	eleve = models.ForeignKey('accounts.Eleve')
 	paye = models.BooleanField()

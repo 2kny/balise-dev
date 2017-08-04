@@ -5,7 +5,5 @@ from django.utils.translation import ugettext_lazy as _
 class participationForm(ModelForm):
 	class Meta:
 		model = Participation
-		fields = ['participation']
-		labels = {
-			'participation': _(''),
-		}
+		fields = []
+		labels = {}
