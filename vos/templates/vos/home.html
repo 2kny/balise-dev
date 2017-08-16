@@ -2,51 +2,51 @@
 
 {% block content %}
 	<h1>Tableau de bord du {{ vos_var }}</h1>
-<table class='table table-bordered'>
+<table class='table table-bordered table-condensed'>
 <tr>
 <th>Promo</th>
 <th>Nom</th>
 <th>Prénom</th>
+<th>Entrées</th>
+<th>Prix du VOS</th>
 	{# on récupère la vue générée par la vue générique listView #}
 	{% for cheque in liste_cheques %}
 		<td>
-			Chèque n°{{ cheque.ordre }}
+			<a href={{ cheque.get_cheque_numero }}>Chèque n°{{ cheque.numero }}</a>
 
 
 		</td>
 	{% endfor %}
+<td>Remboursement</td>
 </tr>
-<!--
+
+{% for p in liste_encaissements %}
 <tr>
-<th>Montant</th>
+<td>{{ p.0 }}</td>
+<td>{{ p.1 }}</td>
+<td>{{ p.2 }}</td>
+<th>{{ p.3 }}</th>
+<th>{{ p.4 }}</th>
 	{# on récupère la vue générée par la vue générique listView #}
-	{% for cheque in liste_cheques %}
+	{% for cheque_perso in p.5 %}
 		<td>
-			{{ cheque.montant }}
-
-
+			{{ cheque_perso }}
 		</td>
 	{% endfor %}
-</tr>
--->
-{% for p in liste_participants %}
-<tr>
-<th>{{ p.promotion }}</th>
-<th>{{ p.nom }}</th>
-<th>{{ p.prenom }}</th>
-	{# on récupère la vue générée par la vue générique listView #}
-	{% for cheque in liste_cheques %}
-		<td>
-			{{ cheque.montant }}
-
-
-		</td>
-	{% endfor %}
+<td><a href={{ p.7 }}>{{ p.6 }}</a></td>
 </tr>
 {% endfor %}
+
+<tr>
+<th colspan="3" class="txtdroite">TOTAL :</th>
+<th class='encadre'>{{ total_general }}</th>
+<th class='encadre'>{{ total_general1 }}</th>
+</tr>
 </table>
 
 <div class='row txtcentre'>
-<a href='/vos/liste'>Liste des participants</a>
+<a href='/vos/liste'>Liste des participants</a> - 
+<a href='/vos/cheque'>Ajouter un chèque</a> - 
+<a href='/vos/remboursement'>Ajouter un remboursement</a>
 </div>
 {% endblock %}

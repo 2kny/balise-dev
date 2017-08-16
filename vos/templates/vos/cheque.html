@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<a href='/vos'><h2>Tableau de bord du {{ vos_var }}</h2></a>
+	<h1>{{ cheque }}</h1>
+	<div class='row txtcentre'>
+	<form action='' method='post'>
+	{% csrf_token %}
+	{{ form_montant }}
+	<input type='submit' name = 'submit' class='btn btn-primary' value='Enregistrer' />
+	<!--<input type='submit' name = 'submit' class='btn btn-danger' value='Supprimer' />-->
+	</div>
+
+
+<table class='table table-bordered'>
+<tr>
+<th>Promo</th>
+<th>Nom</th>
+<th>Prénom</th>
+</tr>
+{% for eleve in paye %}
+<tr>
+<th>{{ eleve.1 }}</th>
+<td>{{ eleve.2 }}</td>
+<td>{{ eleve.3 }}</td>
+<td>{{ eleve.4 }}</td>
+<td class='txtcentre'>
+<form method='post' action=''>
+	{% csrf_token %}
+	{{ form_paye.as_p }}
+	<input type='hidden' name='eleve' value={{eleve.5}} />
+	{% if eleve.0 %}
+		<input type='submit' name = 'submit' class='btn btn-success' value='Retirer' />
+	{% else %}
+		<input type='submit' name = 'submit' class='btn btn-primary' value='Ajouter' />
+	{% endif %}
+</form>
+</td>
+</tr>
+{% endfor %}
+</table>
+
+
+<div class='row txtcentre'>
+<a href='/vos/liste'>Liste des participants</a>
+</div>
+{% endblock %}
