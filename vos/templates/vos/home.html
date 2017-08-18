@@ -2,6 +2,7 @@
 
 {% block content %}
 	<h1>Tableau de bord du {{ vos_var }}</h1>
+<div class='row'>Le mot du SecGen : merci de préparer votre première remise de chèques DÈS VOTRE RETOUR SUR LE PLATÂL, elle sera encaissée vendredi 13 septembre.</div>
 <table class='table table-bordered table-condensed'>
 <tr>
 <th>Promo</th>
@@ -9,6 +10,8 @@
 <th>Prénom</th>
 <th>Entrées</th>
 <th>Prix du VOS</th>
+<td><a href="/vos/subvention/banque">Subvention banque</a></td>
+<td><a href="/vos/subvention/3A">Subvention 3A</a></td>
 	{# on récupère la vue générée par la vue générique listView #}
 	{% for cheque in liste_cheques %}
 		<td>
@@ -27,6 +30,8 @@
 <td>{{ p.2 }}</td>
 <th>{{ p.3 }}</th>
 <th>{{ p.4 }}</th>
+<td>?</td>
+<td>?</td>
 	{# on récupère la vue générée par la vue générique listView #}
 	{% for cheque_perso in p.5 %}
 		<td>
@@ -46,7 +51,6 @@
 
 <div class='row txtcentre'>
 <a href='/vos/liste'>Liste des participants</a> - 
-<a href='/vos/cheque'>Ajouter un chèque</a> - 
-<a href='/vos/remboursement'>Ajouter un remboursement</a>
+<a href='/vos/cheque'>Ajouter un chèque</a>
 </div>
 {% endblock %}

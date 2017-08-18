@@ -2,6 +2,7 @@
 
 {% block content %}
 	<a href='/vos'><h2>Tableau de bord du {{ vos_var }}</h2></a>
+{% if cheque %}
 	<h1>{{ cheque }}</h1>
 	<div class='row txtcentre'>
 	<form action='' method='post'>
@@ -9,6 +10,8 @@
 	{{ form_montant }}
 	<input type='submit' name = 'submit' class='btn btn-primary' value='Enregistrer' />
 	<!--<input type='submit' name = 'submit' class='btn btn-danger' value='Supprimer' />-->
+	</form>
+{% endif %}
 	</div>
 
 

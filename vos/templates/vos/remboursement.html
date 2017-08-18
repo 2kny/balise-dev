@@ -4,7 +4,7 @@
 	<a href='/vos'><h2>Tableau de bord du {{ vos_var }}</h2></a>
 	<div class='row txtcentre'>
 	{% if modif %}
-		<h2>Modifier le remboursement de {{ e }} :</h2>
+		<h2>{{ modif }}{{ e }} :</h2>
 	{% endif %}
 	<form action='' method='post'>
 	{% csrf_token %}

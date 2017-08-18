@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-	<h1>Définir les participants au {{ vos_var }}</h1>
+	<h1>Définir les participants au <a href='/vos'>{{ vos_var }}</a></h1>
 <table class='table table-bordered'>
 <tr>
 <th><div class='title-order-container'><div>Promo</div><a href='{{ ordering_links.pop }}'><img class='order-icon' src="{% static 'img/order.ico' %}" alt="Order Icon" title="Ordonner par promotion"/></a></div></th>
