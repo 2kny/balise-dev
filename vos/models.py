@@ -74,3 +74,25 @@ class Remboursement(models.Model):
 	def get_remboursement_numero(self):
 		"""returns the link to the remboursement modification form"""
 		return ('remboursement_id', [self.id])
+
+class SubventionBanque(models.Model):
+	"""table des activations de compte"""
+	eleve = models.ForeignKey('vos.EleveVos')
+	compte = models.BooleanField()
+	solde = models.BooleanField()
+	actif = models.BooleanField()
+
+class MontantSubventions(models.Model):
+	"""montant des subventions banque et 3A pour les différents événements"""
+	promotion = models.ForeignKey('accounts.Promotion', verbose_name = "Promo")
+	banque = models.DecimalField(max_digits=5, decimal_places=2)
+	vos = models.DecimalField(max_digits=5, decimal_places=2)
+	jsp = models.DecimalField(max_digits=5, decimal_places=2)
+	dez = models.DecimalField(max_digits=5, decimal_places=2)
+
+class Utilisation(models.Model):
+	"""table du moment où chaque subvention est utilisée"""
+	eleve = models.ForeignKey('vos.EleveVos')
+	evenement = models.ForeignKey('binets.Mandat')
+	banque = models.BooleanField(default=False)
+	s3a = models.BooleanField(default=False)

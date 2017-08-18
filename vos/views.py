@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from subventions.helpers import generate_ordering_arguments, generate_ordering_links
-from vos.models import Participation, MontantCheque, Encaissement, EleveVos, Remboursement
+from vos.models import Participation, MontantCheque, Encaissement, EleveVos, Remboursement, Utilisation, SubventionBanque
 from binets.models import Mandat, TypeBinet
 from django.db.models import Q
 from .forms import participationForm, chequeForm, remboursementForm, r_modifForm
@@ -63,10 +63,9 @@ def home(request):
 		if (len(r)>0):
 			remboursement = (r[0]).montant
 			total1-=remboursement
-			lien = "/vos/remboursement/"+str(e.id)
 		else:
-			remboursement = ""
-			lien=""
+			remboursement = "+"
+		lien = "/vos/remboursement/"+str(e.id)
 		liste_encaissements.append([e.promotion,e.nom,e.prenom,total,total1,cheques_perso,remboursement,lien])
 		total_general+=total
 		total_general1+=total1
@@ -257,40 +256,6 @@ def participants(request):
 
 	return render(request, "vos/participants.html", locals())
 
-@login_required
-def remboursement(request):
-	try:
-		vos_var = Mandat.objects.get(
-			id = request.session['id_mandat'])
-	except KeyError:
-		return redirect('../')
-	# on récupère la liste des utilisateurs habilités
-	# à accéder à la page
-	authorized = vos_var.get_authorized_users()
-	if request.user not in authorized['view'] and not(request.user.is_staff):
-		return redirect('../')
-
-	if request.POST:
-		eleve_id = request.POST.get('eleve', '')
-		e = EleveVos.objects.filter(id=eleve_id)[0]
-		rs = Remboursement.objects.filter(evenement=vos_var,eleve=e)
-		if rs:
-			for r in rs:
-				r.montant=request.POST.get('montant','')
-				r.eleve=e
-				r.save()
-		else:
-			r = Remboursement(evenement=vos_var,
-					montant=request.POST.get('montant',''),
-					eleve=e,
-					paye=True)
-			r.save()
-		return redirect('/vos')
-	
-	form = remboursementForm(request.POST or None)
-	modif = False
-
-	return render(request, "vos/remboursement.html", locals())
 
 @login_required
 def remboursement_modif(request, e_id):
@@ -313,14 +278,116 @@ def remboursement_modif(request, e_id):
 		return redirect('../')
 
 	if request.POST:
-		for r in rs:
-			r.montant=request.POST.get('montant','')
-			r.eleve=e
+		if rs:
+			for r in rs:
+				r.montant=request.POST.get('montant','')
+				r.eleve=e
+				r.save()
+		else:
+			r = Remboursement(evenement=vos_var,
+					montant=request.POST.get('montant',''),
+					eleve=e,
+					paye=True)
 			r.save()
 		return redirect('/vos')
 	
-	form = r_modifForm(instance=rs[0])
-
-	modif=True
+	if rs:
+		modif="Modifier le remboursement de "
+		form = r_modifForm(instance=rs[0])
+	else:
+		modif="Ajouter un remboursement à "
+		form = r_modifForm(request.POST or None)
 
 	return render(request, "vos/remboursement.html", locals())
+
+
+@login_required
+def subvention(request, subv):
+	"""déterminer qui utilise la subvention subv"""
+
+	try:
+		vos_var = Mandat.objects.get(
+			id = request.session['id_mandat'])
+	except KeyError:
+		return redirect('../')
+	# on récupère la liste des utilisateurs habilités
+	# à accéder à la page
+	authorized = vos_var.get_authorized_users()
+	if request.user not in authorized['view'] and not(request.user.is_staff):
+		return redirect('../')
+	promo = vos_var.promotion
+
+	if request.POST:
+		action = request.POST.get('submit','')
+		if action == 'Enregistrer':
+			montant=request.POST.get('montant','')
+			cheque.montant=montant
+			cheque.save()
+		if action == 'Ajouter':
+			eleve_id = request.POST.get('eleve', '')
+			e = EleveVos.objects.get(id=eleve_id)
+			if subv=='banque':
+				r = Utilisation.objects.filter(
+				eleve=e,
+				banque=True)
+			if subv=='3A':
+				r = Utilisation.objects.filter(
+				eleve=e,
+				s3a=True)
+			if len(r) == 0:
+				if subv=='banque':
+					p = Utilisation(eleve=e, evenement=vos_var, banque=True)
+				if subv=='3A':
+					p = Utilisation(eleve=e, evenement=vos_var, s3a=True)
+				p.save()
+		if action == 'Retirer':
+			eleve_id = request.POST.get('eleve', '')
+			e = EleveVos.objects.filter(id=eleve_id)[0]
+			if subv=='banque':
+				r = Utilisation.objects.filter(
+				eleve=e,
+				banque=True)
+			if subv=='3A':
+				r = Utilisation.objects.filter(
+				eleve=e,
+				s3a=True)
+			if len(r) > 0:
+				for p in r:
+					p.delete()
+	
+	liste_participants = Participation.objects.filter(
+			evenement=vos_var, 
+			participation=True
+			).order_by('-eleve__promotion','eleve__nom','eleve__prenom').values('eleve').distinct()
+	paye=[]
+	for e in liste_participants:
+		p=EleveVos.objects.get(id=e['eleve'])
+		if subv=='banque':
+			r = Utilisation.objects.filter(
+			eleve=p,
+			banque=True)
+			compte = SubventionBanque.objects.filter(eleve=p)
+			condition = (len(compte) > 0) and (compte[0].compte and compte[0].solde and compte[0].actif)
+		if subv=='3A':
+			r = Utilisation.objects.filter(
+			eleve=p,
+			s3a=True)
+			condition = (p.promotion==promo)
+		if condition:
+			if len(r)==0:
+				paye.append([False,p.promotion,p.section,p.nom,p.prenom,p.id])	
+			else:
+				if r[0].evenement==vos_var:
+					paye.append([True,p.promotion,p.section,p.nom,p.prenom,p.id])
+			
+
+	form_paye = participationForm(request.POST or None)
+
+	return render(request, "vos/cheque.html", locals())
+
+@login_required
+def subventionB(request):
+	return subvention(request, 'banque')
+@login_required
+def subventionA(request):
+	return subvention(request, '3A')
